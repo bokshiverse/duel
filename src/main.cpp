@@ -65,20 +65,25 @@ int main()
     Sound switchbg =
         LoadSound("assets/audio/switch.ogg");
 
+	Sound loadingbg =
+        LoadSound("assets/audio/loading.ogg");
+
+
     Texture2D wallpaper =
         LoadTexture("assets/images/wallpaper4.png");
 
     Screen screen;
 
     float alpha = 0.0f;
-    float fadeDuration = 3.0f;
+    float fadeDuration = 5.0f;
 
     float elapsedTime = 0.0f;
-    float loadingDuration = 3.0f;
+    float loadingDuration = 6.0f;
 
     while (!WindowShouldClose())
     {
         float dt = GetFrameTime();
+		PlaySound(loadingbg);
 
         if (CURRENT_SCREEN == LOADING)
         {
@@ -182,38 +187,47 @@ int main()
                 WHITE
             );
 
-            if (CURRENT_OPTION == CREATE_ROOM)
-            {
-                DrawRectangle(
-                    1450,
-                    720,
-                    500,
-                    100,
-                    DARKGRAY
-                );
-            }
+            Color createBg =
+                CURRENT_OPTION == CREATE_ROOM ? WHITE : BLACK;
 
-            if (CURRENT_OPTION == JOIN_ROOM)
-            {
-                DrawRectangle(
-                    1450,
-                    820,
-                    500,
-                    100,
-                    DARKGRAY
-                );
-            }
+            Color createText =
+                CURRENT_OPTION == CREATE_ROOM ? BLACK : WHITE;
 
-            if (CURRENT_OPTION == SETTINGS)
-            {
-                DrawRectangle(
-                    1450,
-                    920,
-                    500,
-                    100,
-                    DARKGRAY
-                );
-            }
+            Color joinBg =
+                CURRENT_OPTION == JOIN_ROOM ? WHITE : BLACK;
+
+            Color joinText =
+                CURRENT_OPTION == JOIN_ROOM ? BLACK : WHITE;
+
+            Color settingsBg =
+                CURRENT_OPTION == SETTINGS ? WHITE : BLACK;
+
+            Color settingsText =
+                CURRENT_OPTION == SETTINGS ? BLACK : WHITE;
+
+            DrawRectangle(
+                1450,
+                721,
+                500,
+                100,
+                createBg
+            );
+
+            DrawRectangle(
+                1450,
+                821,
+                500,
+                100,
+                joinBg
+            );
+
+            DrawRectangle(
+                1450,
+                921,
+                500,
+                100,
+                settingsBg
+            );
 
             DrawTextEx(
                 poppinsBlackFont,
@@ -224,7 +238,7 @@ int main()
                 },
                 65,
                 1,
-                WHITE
+                createText
             );
 
             DrawTextEx(
@@ -236,7 +250,7 @@ int main()
                 },
                 65,
                 1,
-                WHITE
+                joinText
             );
 
             DrawTextEx(
@@ -248,7 +262,7 @@ int main()
                 },
                 65,
                 1,
-                WHITE
+                settingsText
             );
         }
 
@@ -262,6 +276,7 @@ int main()
     UnloadFont(poppinsBlackFont);
 
     UnloadSound(switchbg);
+    UnloadSound(loadingbg);
     UnloadMusicStream(bgm);
 
     CloseAudioDevice();
