@@ -1,20 +1,24 @@
-#include <raylib.h>
+#include "raylib.h"
 
 int main()
 {
-    InitWindow(800, 450, "Duel");
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(1280, 720, "Duel");
+
+    ToggleFullscreen();
+
+    SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
-        DrawText("Hello Duel!", 300, 200, 30, BLACK);
+        ClearBackground(BLACK);
+
+        DrawText("Fullscreen", 50, 50, 30, RAYWHITE);
 
         EndDrawing();
     }
 
     CloseWindow();
-
-    return 0;
 }
