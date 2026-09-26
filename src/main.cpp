@@ -1,6 +1,20 @@
-#include <iostream>
+#include <raylib.h>
 
-int main (int argc, char *args[]) {
-	std::cout << "Hello World!" << "\n";
-	return 0;
+int main()
+{
+    InitWindow(800, 450, "Duel");
+
+    while (!WindowShouldClose())
+    {
+        BeginDrawing();
+
+        ClearBackground(RAYWHITE);
+        DrawText("Hello Duel!", 300, 200, 30, BLACK);
+
+        EndDrawing();
+    }
+
+    CloseWindow();
+
+    return 0;
 }
