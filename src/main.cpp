@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "raylib.h"
-
 #include "screen.h"
 
 Color darkRed = (Color){100, 0, 0, 255};
@@ -12,12 +11,19 @@ enum SCREEN
     HOME
 };
 
+enum OPTION
+{
+	CREATE_ROOM,
+	JOIN_ROOM,
+	SETTINGS
+}
+
 int main()
 {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1280, 720, "Duel");
 
-	InitAudioDevice();
+    InitAudioDevice();
 
     ToggleFullscreen();
 
@@ -41,9 +47,23 @@ int main()
             0
         );
 
-	Music bgm = LoadMusicStream("assets/audio/bgm.wav");
+	Font poppinsBlackFont =
+        LoadFontEx(
+            "assets/fonts/poppins.black.ttf",
+            200,
+            nullptr,
+            0
+        );
 
-    PlayMusicStream(bgm);
+
+    Music bgm =
+        LoadMusicStream("assets/audio/bgm.ogg");
+
+    // Don't play it here!
+    // PlayMusicStream(bgm);
+
+    Texture2D wallpaper =
+        LoadTexture("assets/images/wallpaper4.png");
 
     Screen screen;
 
@@ -57,8 +77,6 @@ int main()
     {
         float dt = GetFrameTime();
 
-		UpdateMusicStream(bgm);
-
         // -------------------------
         // Loading screen timer
         // -------------------------
@@ -70,8 +88,19 @@ int main()
             if (elapsedTime >= loadingDuration)
             {
                 CURRENT_SCREEN = HOME;
-				PlayMusicStream(bgm);
+
+                // Start music when entering HOME
+                PlayMusicStream(bgm);
             }
+        }
+
+        // -------------------------
+        // Music
+        // -------------------------
+
+        if (CURRENT_SCREEN == HOME)
+        {
+            UpdateMusicStream(bgm);
         }
 
         // -------------------------
@@ -122,27 +151,94 @@ int main()
         }
         else if (CURRENT_SCREEN == HOME)
         {
+            // -------------------------
             // HOME SCREEN
-			//
+            // -------------------------
 
-			render image full screen from assets/images/wallpaper.jpg
-            DrawText(
-                "HOME",
-                100,
-                100,
-                50,
+            DrawTexturePro(
+                wallpaper,
+
+                // Source rectangle
+                {
+                    0,
+                    0,
+                    (float)wallpaper.width,
+                    (float)wallpaper.height
+                },
+
+                // Destination rectangle
+                {
+                    0,
+                    0,
+                    (float)GetScreenWidth(),
+                    (float)GetScreenHeight()
+                },
+
+                // Origin
+                {
+                    0,
+                    0
+                },
+
+                // Rotation
+                0.0f,
+
+                // Tint
                 WHITE
             );
+
+			DrawTextEx(
+                poppinsBlackFont,
+                "CREATE ROOM",
+                {
+                    1500,
+                    750
+                },
+                65,
+                1,
+                WHITE
+            );
+
+
+			DrawTextEx(
+                poppinsBlackFont,
+                "JOIN ROOM",
+                {
+                    1570,
+                    850
+                },
+                65,
+                1,
+                WHITE
+            );
+
+           
+			DrawTextEx(
+                poppinsBlackFont,
+                "SETTINGS",
+                {
+                    1610,
+                    950
+                },
+                65,
+                1,
+                WHITE
+            );
+
         }
 
         EndDrawing();
     }
 
+    UnloadTexture(wallpaper);
+
     UnloadFont(katsunoFont);
     UnloadFont(poppinsFont);
 
-	UnloadMusicStream(bgm);
-	CloseAudioDevice();
+    UnloadMusicStream(bgm);
 
+    CloseAudioDevice();
     CloseWindow();
+
+    return 0;
 }
