@@ -13,9 +13,9 @@ enum SCREEN
 
 enum OPTION
 {
-	CREATE_ROOM,
-	JOIN_ROOM,
-	SETTINGS
+    CREATE_ROOM,
+    JOIN_ROOM,
+    SETTINGS
 };
 
 int main()
@@ -30,7 +30,7 @@ int main()
     SetTargetFPS(60);
 
     SCREEN CURRENT_SCREEN = LOADING;
-	OPTION CURRENT_OPTION = CREATE_ROOM;
+    OPTION CURRENT_OPTION = CREATE_ROOM;
 
     Font katsunoFont =
         LoadFontEx(
@@ -48,7 +48,7 @@ int main()
             0
         );
 
-	Font poppinsBlackFont =
+    Font poppinsBlackFont =
         LoadFontEx(
             "assets/fonts/poppins.black.ttf",
             200,
@@ -56,14 +56,13 @@ int main()
             0
         );
 
-
     Music bgm =
         LoadMusicStream("assets/audio/bgm.ogg");
+	bgm.looping = true;
+	SetMusicVolume(bgm, 0.1f);
 
-   Music switchbg =
-        LoadMusicStream("assets/audio/switch.ogg");
-
-
+    Sound switchbg =
+        LoadSound("assets/audio/switch.ogg");
 
     Texture2D wallpaper =
         LoadTexture("assets/images/wallpaper4.png");
@@ -80,10 +79,6 @@ int main()
     {
         float dt = GetFrameTime();
 
-        // -------------------------
-        // Loading screen timer
-        // -------------------------
-
         if (CURRENT_SCREEN == LOADING)
         {
             elapsedTime += dt;
@@ -91,24 +86,41 @@ int main()
             if (elapsedTime >= loadingDuration)
             {
                 CURRENT_SCREEN = HOME;
-
-                // Start music when entering HOME
                 PlayMusicStream(bgm);
             }
         }
 
-        // -------------------------
-        // Music
-        // -------------------------
+        if (CURRENT_SCREEN == HOME)
+        {
+            if (IsKeyPressed(KEY_DOWN))
+            {
+                if (CURRENT_OPTION == CREATE_ROOM)
+                    CURRENT_OPTION = JOIN_ROOM;
+                else if (CURRENT_OPTION == JOIN_ROOM)
+                    CURRENT_OPTION = SETTINGS;
+                else
+                    CURRENT_OPTION = CREATE_ROOM;
+
+                PlaySound(switchbg);
+            }
+
+            if (IsKeyPressed(KEY_UP))
+            {
+                if (CURRENT_OPTION == CREATE_ROOM)
+                    CURRENT_OPTION = SETTINGS;
+                else if (CURRENT_OPTION == JOIN_ROOM)
+                    CURRENT_OPTION = CREATE_ROOM;
+                else
+                    CURRENT_OPTION = JOIN_ROOM;
+
+                PlaySound(switchbg);
+            }
+        }
 
         if (CURRENT_SCREEN == HOME)
         {
             UpdateMusicStream(bgm);
         }
-
-        // -------------------------
-        // Fade
-        // -------------------------
 
         if (alpha < 1.0f)
         {
@@ -117,10 +129,6 @@ int main()
             if (alpha > 1.0f)
                 alpha = 1.0f;
         }
-
-        // -------------------------
-        // Rendering
-        // -------------------------
 
         BeginDrawing();
 
@@ -154,80 +162,83 @@ int main()
         }
         else if (CURRENT_SCREEN == HOME)
         {
-            // -------------------------
-            // HOME SCREEN
-            // -------------------------
-
             DrawTexturePro(
                 wallpaper,
-
-                // Source rectangle
                 {
                     0,
                     0,
                     (float)wallpaper.width,
                     (float)wallpaper.height
                 },
-
-                // Destination rectangle
                 {
                     0,
                     0,
                     (float)GetScreenWidth(),
                     (float)GetScreenHeight()
                 },
-
-                // Origin
                 {
                     0,
                     0
                 },
-
-                // Rotation
                 0.0f,
-
-                // Tint
                 WHITE
             );
 
-			DrawTextEx(
-                poppinsBlackFont,
-                "CREATE ROOM",
-                {
-                    1500,
-                    750
-                },
-                65,
-                1,
-                WHITE
-            );
+			DrawRectangle(
+				1450,
+				720,
+				500,
+				100,
+				DARKGRAY
+			);
+
+			if (CURRENT_OPTION == CREATE_ROOM) {
+				DrawRectangle(
+					1500,
+					850,
+					350,
+					100,
+					DARKGRAY
+				);
+
+				DrawTextEx(
+					poppinsBlackFont,
+					"CREATE ROOM",
+					{
+					    1500,
+						850
+					},
+					65,
+					1,
+					WHITE
+				);
 
 
-			DrawTextEx(
-                poppinsBlackFont,
-                "JOIN ROOM",
-                {
-                    1570,
-                    850
-                },
-                65,
-                1,
-                WHITE
-            );
+				DrawTextEx(
+					poppinsBlackFont,
+					"JOIN ROOM",
+					{
+						1570,
+						850
+					},
+					65,
+					1,
+					WHITE
+				);
 
-           
-			DrawTextEx(
-                poppinsBlackFont,
-                "SETTINGS",
-                {
-                    1610,
-                    950
-                },
-                65,
-                1,
-                WHITE
-            );
+				DrawTextEx(
+					poppinsBlackFont,
+					"SETTINGS",
+					{
+						1610,
+						950
+					},
+					65,
+					1,
+					WHITE
+				);
 
+			}
         }
 
         EndDrawing();
@@ -237,7 +248,9 @@ int main()
 
     UnloadFont(katsunoFont);
     UnloadFont(poppinsFont);
+    UnloadFont(poppinsBlackFont);
 
+    UnloadSound(switchbg);
     UnloadMusicStream(bgm);
 
     CloseAudioDevice();
