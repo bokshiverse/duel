@@ -58,8 +58,9 @@ int main()
 
     Music bgm =
         LoadMusicStream("assets/audio/bgm.ogg");
-	bgm.looping = true;
-	SetMusicVolume(bgm, 0.1f);
+
+    bgm.looping = true;
+    SetMusicVolume(bgm, 0.1f);
 
     Sound switchbg =
         LoadSound("assets/audio/switch.ogg");
@@ -115,10 +116,7 @@ int main()
 
                 PlaySound(switchbg);
             }
-        }
 
-        if (CURRENT_SCREEN == HOME)
-        {
             UpdateMusicStream(bgm);
         }
 
@@ -184,61 +182,74 @@ int main()
                 WHITE
             );
 
-			DrawRectangle(
-				1450,
-				720,
-				500,
-				100,
-				DARKGRAY
-			);
+            if (CURRENT_OPTION == CREATE_ROOM)
+            {
+                DrawRectangle(
+                    1450,
+                    720,
+                    500,
+                    100,
+                    DARKGRAY
+                );
+            }
 
-			if (CURRENT_OPTION == CREATE_ROOM) {
-				DrawRectangle(
-					1500,
-					850,
-					350,
-					100,
-					DARKGRAY
-				);
+            if (CURRENT_OPTION == JOIN_ROOM)
+            {
+                DrawRectangle(
+                    1450,
+                    820,
+                    500,
+                    100,
+                    DARKGRAY
+                );
+            }
 
-				DrawTextEx(
-					poppinsBlackFont,
-					"CREATE ROOM",
-					{
-					    1500,
-						850
-					},
-					65,
-					1,
-					WHITE
-				);
+            if (CURRENT_OPTION == SETTINGS)
+            {
+                DrawRectangle(
+                    1450,
+                    920,
+                    500,
+                    100,
+                    DARKGRAY
+                );
+            }
 
+            DrawTextEx(
+                poppinsBlackFont,
+                "CREATE ROOM",
+                {
+                    1500,
+                    735
+                },
+                65,
+                1,
+                WHITE
+            );
 
-				DrawTextEx(
-					poppinsBlackFont,
-					"JOIN ROOM",
-					{
-						1570,
-						850
-					},
-					65,
-					1,
-					WHITE
-				);
+            DrawTextEx(
+                poppinsBlackFont,
+                "JOIN ROOM",
+                {
+                    1500,
+                    835
+                },
+                65,
+                1,
+                WHITE
+            );
 
-				DrawTextEx(
-					poppinsBlackFont,
-					"SETTINGS",
-					{
-						1610,
-						950
-					},
-					65,
-					1,
-					WHITE
-				);
-
-			}
+            DrawTextEx(
+                poppinsBlackFont,
+                "SETTINGS",
+                {
+                    1500,
+                    935
+                },
+                65,
+                1,
+                WHITE
+            );
         }
 
         EndDrawing();
