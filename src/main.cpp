@@ -16,7 +16,7 @@ enum OPTION
 	CREATE_ROOM,
 	JOIN_ROOM,
 	SETTINGS
-}
+};
 
 int main()
 {
@@ -30,6 +30,7 @@ int main()
     SetTargetFPS(60);
 
     SCREEN CURRENT_SCREEN = LOADING;
+	OPTION CURRENT_OPTION = CREATE_ROOM;
 
     Font katsunoFont =
         LoadFontEx(
@@ -59,8 +60,10 @@ int main()
     Music bgm =
         LoadMusicStream("assets/audio/bgm.ogg");
 
-    // Don't play it here!
-    // PlayMusicStream(bgm);
+   Music switchbg =
+        LoadMusicStream("assets/audio/switch.ogg");
+
+
 
     Texture2D wallpaper =
         LoadTexture("assets/images/wallpaper4.png");
