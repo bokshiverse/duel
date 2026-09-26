@@ -1,9 +1,5 @@
-#include <iostream>
-
 #include "raylib.h"
 #include "screen.h"
-
-Color darkRed = (Color){100, 0, 0, 255};
 
 enum SCREEN
 {
@@ -22,15 +18,19 @@ int main()
 {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1280, 720, "Duel");
-
     InitAudioDevice();
 
     ToggleFullscreen();
-
     SetTargetFPS(60);
+
+    Screen screen;
 
     SCREEN CURRENT_SCREEN = LOADING;
     OPTION CURRENT_OPTION = CREATE_ROOM;
+
+    // --------------------------------------------------
+    // Fonts
+    // --------------------------------------------------
 
     Font katsunoFont =
         LoadFontEx(
@@ -56,56 +56,123 @@ int main()
             0
         );
 
+    // --------------------------------------------------
+    // Images
+    // --------------------------------------------------
+
+    Texture2D wallpaper =
+        LoadTexture("assets/images/wallpaper4.png");
+
+    // --------------------------------------------------
+    // Audio
+    // --------------------------------------------------
+
+    // Main background music
     Music bgm =
         LoadMusicStream("assets/audio/bgm.ogg");
 
     bgm.looping = true;
     SetMusicVolume(bgm, 0.1f);
 
+    // Menu switch sound
     Sound switchbg =
         LoadSound("assets/audio/switch.ogg");
 
-	Sound loadingbg =
+    SetSoundVolume(switchbg, 0.7f);
+
+    // Loading screen sound
+    Sound loadingbg =
         LoadSound("assets/audio/loading.ogg");
+    SetSoundVolume(loadingbg, 0.7f);
 
+    // Start loading sound once.
+    // Because looping = true, raylib keeps repeating it.
+    PlaySound(loadingbg);
 
-    Texture2D wallpaper =
-        LoadTexture("assets/images/wallpaper4.png");
-
-    Screen screen;
+    // --------------------------------------------------
+    // Loading screen timing
+    // --------------------------------------------------
 
     float alpha = 0.0f;
-    float fadeDuration = 5.0f;
 
+    float fadeDuration = 5.0f;
     float elapsedTime = 0.0f;
-    float loadingDuration = 6.0f;
+
+    float loadingDuration = 8.0f;
+
+    // --------------------------------------------------
+    // Main loop
+    // --------------------------------------------------
 
     while (!WindowShouldClose())
     {
         float dt = GetFrameTime();
-		PlaySound(loadingbg);
+
+        // ==============================================
+        // GLOBAL TIME
+        // ==============================================
+
+        elapsedTime += dt;
+
+        // ==============================================
+        // LOADING SCREEN
+        // ==============================================
 
         if (CURRENT_SCREEN == LOADING)
         {
-            elapsedTime += dt;
+            // Fade DUEL text in
+            if (alpha < 1.0f)
+            {
+                alpha += dt / fadeDuration;
+
+                if (alpha > 1.0f)
+                    alpha = 1.0f;
+            }
+
+            // ------------------------------------------
+            // Finish loading
+            // ------------------------------------------
 
             if (elapsedTime >= loadingDuration)
             {
                 CURRENT_SCREEN = HOME;
+
+                // Stop loading sound
+                StopSound(loadingbg);
+
+                // Start main music
                 PlayMusicStream(bgm);
             }
         }
 
+        // ==============================================
+        // HOME SCREEN
+        // ==============================================
+
         if (CURRENT_SCREEN == HOME)
         {
+            // Music is streamed, so it needs to be
+            // updated every frame.
+            UpdateMusicStream(bgm);
+
+            // ------------------------------------------
+            // Menu navigation
+            // ------------------------------------------
+
             if (IsKeyPressed(KEY_DOWN))
             {
                 if (CURRENT_OPTION == CREATE_ROOM)
+                {
                     CURRENT_OPTION = JOIN_ROOM;
+                }
                 else if (CURRENT_OPTION == JOIN_ROOM)
+                {
                     CURRENT_OPTION = SETTINGS;
+                }
                 else
+                {
                     CURRENT_OPTION = CREATE_ROOM;
+                }
 
                 PlaySound(switchbg);
             }
@@ -113,29 +180,33 @@ int main()
             if (IsKeyPressed(KEY_UP))
             {
                 if (CURRENT_OPTION == CREATE_ROOM)
+                {
                     CURRENT_OPTION = SETTINGS;
+                }
                 else if (CURRENT_OPTION == JOIN_ROOM)
+                {
                     CURRENT_OPTION = CREATE_ROOM;
+                }
                 else
+                {
                     CURRENT_OPTION = JOIN_ROOM;
+                }
 
                 PlaySound(switchbg);
             }
-
-            UpdateMusicStream(bgm);
         }
 
-        if (alpha < 1.0f)
-        {
-            alpha += dt / fadeDuration;
-
-            if (alpha > 1.0f)
-                alpha = 1.0f;
-        }
+        // ==============================================
+        // DRAW
+        // ==============================================
 
         BeginDrawing();
 
         ClearBackground(BLACK);
+
+        // ----------------------------------------------
+        // LOADING
+        // ----------------------------------------------
 
         if (CURRENT_SCREEN == LOADING)
         {
@@ -143,8 +214,8 @@ int main()
                 katsunoFont,
                 "DUEL",
                 {
-                    screen.getScreenWidth() / 2 - 255,
-                    screen.getScreenHeight() / 2 - 255
+                    screen.getScreenWidth() / 2.0f - 255,
+                    screen.getScreenHeight() / 2.0f - 255
                 },
                 255,
                 1,
@@ -155,16 +226,22 @@ int main()
                 poppinsFont,
                 "by BOKSHIVERSE",
                 {
-                    (screen.getScreenWidth() - 270) / 2,
-                    screen.getScreenHeight() - 100
+                    (screen.getScreenWidth() - 270) / 2.0f,
+                    screen.getScreenHeight() - 100.0f
                 },
                 32,
                 1,
                 WHITE
             );
         }
-        else if (CURRENT_SCREEN == HOME)
+
+        // ----------------------------------------------
+        // HOME
+        // ----------------------------------------------
+
+        if (CURRENT_SCREEN == HOME)
         {
+            // Wallpaper
             DrawTexturePro(
                 wallpaper,
                 {
@@ -179,63 +256,81 @@ int main()
                     (float)GetScreenWidth(),
                     (float)GetScreenHeight()
                 },
-                {
-                    0,
-                    0
-                },
+                {0, 0},
                 0.0f,
                 WHITE
             );
 
+            // ------------------------------------------
+            // Menu colors
+            // ------------------------------------------
+
             Color createBg =
-                CURRENT_OPTION == CREATE_ROOM ? WHITE : BLACK;
+                CURRENT_OPTION == CREATE_ROOM
+                    ? WHITE
+                    : BLACK;
 
             Color createText =
-                CURRENT_OPTION == CREATE_ROOM ? BLACK : WHITE;
+                CURRENT_OPTION == CREATE_ROOM
+                    ? BLACK
+                    : WHITE;
 
             Color joinBg =
-                CURRENT_OPTION == JOIN_ROOM ? WHITE : BLACK;
+                CURRENT_OPTION == JOIN_ROOM
+                    ? WHITE
+                    : BLACK;
 
             Color joinText =
-                CURRENT_OPTION == JOIN_ROOM ? BLACK : WHITE;
+                CURRENT_OPTION == JOIN_ROOM
+                    ? BLACK
+                    : WHITE;
 
             Color settingsBg =
-                CURRENT_OPTION == SETTINGS ? WHITE : BLACK;
+                CURRENT_OPTION == SETTINGS
+                    ? WHITE
+                    : BLACK;
 
             Color settingsText =
-                CURRENT_OPTION == SETTINGS ? BLACK : WHITE;
+                CURRENT_OPTION == SETTINGS
+                    ? BLACK
+                    : WHITE;
+
+            // ------------------------------------------
+            // Menu rectangles
+            // ------------------------------------------
 
             DrawRectangle(
-                1450,
-                721,
+                1470,
+                720,
                 500,
-                100,
+                95,
                 createBg
             );
 
             DrawRectangle(
-                1450,
-                821,
+                1470,
+                820,
                 500,
-                100,
+                95,
                 joinBg
             );
 
             DrawRectangle(
-                1450,
-                921,
+                1470,
+                920,
                 500,
-                100,
+                95,
                 settingsBg
             );
+
+            // ------------------------------------------
+            // Menu text
+            // ------------------------------------------
 
             DrawTextEx(
                 poppinsBlackFont,
                 "CREATE ROOM",
-                {
-                    1500,
-                    735
-                },
+                {1500, 735},
                 65,
                 1,
                 createText
@@ -244,10 +339,7 @@ int main()
             DrawTextEx(
                 poppinsBlackFont,
                 "JOIN ROOM",
-                {
-                    1500,
-                    835
-                },
+                {1500, 835},
                 65,
                 1,
                 joinText
@@ -256,10 +348,7 @@ int main()
             DrawTextEx(
                 poppinsBlackFont,
                 "SETTINGS",
-                {
-                    1500,
-                    935
-                },
+                {1500, 935},
                 65,
                 1,
                 settingsText
@@ -269,6 +358,10 @@ int main()
         EndDrawing();
     }
 
+    // ==================================================
+    // CLEANUP
+    // ==================================================
+
     UnloadTexture(wallpaper);
 
     UnloadFont(katsunoFont);
@@ -277,6 +370,7 @@ int main()
 
     UnloadSound(switchbg);
     UnloadSound(loadingbg);
+
     UnloadMusicStream(bgm);
 
     CloseAudioDevice();
